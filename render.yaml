@@ -1,0 +1,39 @@
+# Render Blueprint - Deploy with one click
+# https://render.com/docs/blueprint-spec
+
+services:
+  # Backend API Service
+  - type: web
+    name: shopkeeperai-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false  # Set this manually in Render dashboard
+      - key: SECRET_KEY
+        generateValue: true  # Auto-generate secure secret
+      - key: FRONTEND_URL
+        sync: false  # Set to your frontend URL after deploying
+      - key: DEBUG
+        value: "False"
+      - key: LOG_LEVEL
+        value: "INFO"
+    healthCheckPath: /health
+
+  # Frontend Static Site
+  - type: web
+    name: shopkeeperai-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: build
+    envVars:
+      - key: REACT_APP_API_URL
+        sync: false  # Set to your backend URL after deploying
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
