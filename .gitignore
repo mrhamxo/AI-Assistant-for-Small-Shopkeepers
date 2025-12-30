@@ -19,9 +19,10 @@ dist/
 *.egg-info/
 
 # Database
-*.db
 *.sqlite
 *.sqlite3
+# Allow the main database file to be deployed
+!backend/shopkeeper_assistant.db
 
 # Logs
 logs/
