@@ -200,6 +200,69 @@ DB_PATH=shopkeeper_assistant.db
 - **AI**: Groq API (LLaMA 3.1), Helsinki-NLP
 - **Auth**: JWT, bcrypt
 
+## 🌐 Deployment
+
+### Live Demo
+- **Frontend**: [ai-assistant-for-small-shopkeepers.vercel.app](https://ai-assistant-for-small-shopkeepers.vercel.app)
+- **Backend API**: [shopkeeperai-backend-tnfddrjd.deployra.app](https://shopkeeperai-backend-tnfddrjd.deployra.app)
+
+### Deploy Your Own
+
+#### Backend (Deployra)
+
+1. Create account at [deployra.com](https://deployra.com)
+2. Connect your GitHub repository
+3. Create a **Web Service** with:
+   - **Path to Dockerfile**: `./Dockerfile`
+   - **Internal Port**: `8000`
+4. Add environment variables:
+   - `GROQ_API_KEY` - Your Groq API key
+   - `SECRET_KEY` - Random secure string
+   - `FRONTEND_URL` - Your frontend URL
+
+#### Frontend (Vercel)
+
+1. Create account at [vercel.com](https://vercel.com)
+2. Import your GitHub repository
+3. Set **Root Directory**: `frontend`
+4. Add environment variable:
+   - `REACT_APP_API_URL` - Your backend URL
+
+### Deployment Files
+
+| File | Purpose |
+|------|---------|
+| `Dockerfile` | Backend Docker configuration |
+| `Dockerfile.frontend` | Frontend Docker configuration |
+| `frontend/vercel.json` | Vercel routing configuration |
+
+## 📁 Project Structure
+
+```
+├── backend/
+│   ├── main.py              # FastAPI application
+│   ├── auth.py              # Authentication
+│   ├── database.py          # Database setup
+│   ├── business_logic.py    # Core business logic
+│   ├── ai_intent_parser.py  # AI intent parsing
+│   ├── translation.py       # Translation module
+│   ├── seed_demo_data.py    # Demo data seeder
+│   └── requirements.txt
+│
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── context/
+│   │   └── services/
+│   ├── vercel.json          # Vercel config
+│   └── package.json
+│
+├── Dockerfile               # Backend deployment
+├── Dockerfile.frontend      # Frontend deployment
+└── README.md
+```
+
 ## 📜 License
 
 MIT License - Free for personal and commercial use.

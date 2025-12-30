@@ -150,6 +150,44 @@ npm start
 
 ---
 
+## 🌐 Deployment
+
+### Live Demo
+
+| Service | Platform | URL |
+|---------|----------|-----|
+| Frontend | Vercel | [ai-assistant-for-small-shopkeepers.vercel.app](https://ai-assistant-for-small-shopkeepers.vercel.app) |
+| Backend | Deployra | [shopkeeperai-backend-tnfddrjd.deployra.app](https://shopkeeperai-backend-tnfddrjd.deployra.app) |
+
+### Deploy Backend (Deployra)
+
+1. Go to [deployra.com](https://deployra.com) → New Service → Web Service
+2. Connect GitHub repository
+3. Configure:
+   - **Path to Dockerfile**: `./Dockerfile`
+   - **External Port**: `80`
+   - **Internal Port**: `8000`
+4. Add Environment Variables:
+   ```
+   GROQ_API_KEY=your_groq_api_key
+   SECRET_KEY=your_random_secret
+   FRONTEND_URL=https://your-frontend.vercel.app
+   ```
+5. Deploy!
+
+### Deploy Frontend (Vercel)
+
+1. Go to [vercel.com](https://vercel.com) → Add New Project
+2. Import GitHub repository
+3. Set **Root Directory**: `frontend`
+4. Add Environment Variable:
+   ```
+   REACT_APP_API_URL=https://your-backend.deployra.app
+   ```
+5. Deploy!
+
+---
+
 ## 📞 Need Help?
 
 - Check the **Help** page at /help
