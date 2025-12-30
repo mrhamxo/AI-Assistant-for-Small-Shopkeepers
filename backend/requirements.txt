@@ -1,0 +1,30 @@
+# ShopKeeperAI Backend Dependencies
+# Python 3.10+ required
+
+# Web Framework
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+
+# Authentication
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+bcrypt==4.0.1
+
+# Data Validation
+pydantic>=2.5.0
+email-validator>=2.1.0
+
+# Environment
+python-dotenv>=1.0.0
+
+# AI/ML
+groq>=0.4.0
+transformers>=4.36.0
+torch>=2.1.0
+sentencepiece>=0.1.99
+
+# HTTP Client
+httpx>=0.26.0
+
+# Utilities
+python-multipart>=0.0.6
