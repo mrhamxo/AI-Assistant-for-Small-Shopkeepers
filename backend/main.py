@@ -34,12 +34,15 @@ app = FastAPI(
 
 # CORS configuration - supports both local and production
 import os
-FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
+FRONTEND_URL = os.getenv("FRONTEND_URL", "")
 allowed_origins = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    FRONTEND_URL,
+    "https://ai-assistant-for-small-shopkeepers.vercel.app",
 ]
+# Add custom frontend URL if provided
+if FRONTEND_URL:
+    allowed_origins.append(FRONTEND_URL)
 
 app.add_middleware(
     CORSMiddleware,
