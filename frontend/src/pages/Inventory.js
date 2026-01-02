@@ -282,7 +282,9 @@ function Inventory() {
                         <div className="price-item profit">
                           <span className="price-label">Margin</span>
                           <span className="price-value">
-                            {((((item.selling_price || item.cost_price) - item.cost_price) / item.cost_price) * 100).toFixed(0)}%
+                            {item.cost_price > 0 
+                              ? ((((item.selling_price || item.cost_price) - item.cost_price) / item.cost_price) * 100).toFixed(0) 
+                              : 0}%
                           </span>
                         </div>
                       </div>
@@ -313,7 +315,9 @@ function Inventory() {
                   <tbody>
                     {filteredInventory.map((item, idx) => {
                       const status = getStockStatus(item.stock);
-                      const margin = ((item.selling_price || item.cost_price) - item.cost_price) / item.cost_price * 100;
+                      const margin = item.cost_price > 0 
+                        ? ((item.selling_price || item.cost_price) - item.cost_price) / item.cost_price * 100 
+                        : 0;
                       return (
                         <tr key={idx} className={status.class}>
                           <td className="product-name">{item.name}</td>

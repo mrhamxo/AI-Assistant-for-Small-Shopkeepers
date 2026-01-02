@@ -1,195 +1,131 @@
 # 🚀 Quick Start Guide
 
-## Step 1: Start Backend
+## Live Demo
 
-```powershell
-# Navigate to backend
-cd backend
+**Try it now:** [ai-assistant-for-small-shopkeepers.vercel.app](https://ai-assistant-for-small-shopkeepers.vercel.app)
 
-# Activate virtual environment
-.\venv\Scripts\activate
-
-# (First time only) Install dependencies
-pip install -r requirements.txt
-
-# (Optional) Add demo data
-python seed_demo_data.py
-
-# Start server
-python run.py
-```
-
-Backend starts at: **http://localhost:8000**
+| Role | Email | Password |
+|------|-------|----------|
+| Shopkeeper | demo@shopkeeper.com | demo123 |
+| Admin | admin@shopkeeper.com | admin123 |
 
 ---
 
-## Step 2: Start Frontend
+## Local Development
+
+### Step 1: Start Backend
+
+```powershell
+cd backend
+.\venv\Scripts\activate          # Activate virtual environment
+pip install -r requirements.txt  # First time only
+python seed_demo_data.py         # Optional: add demo data
+python run.py                    # Start server
+```
+
+Backend: **http://localhost:8000**
+
+### Step 2: Start Frontend
 
 Open a **NEW** terminal:
 
 ```powershell
-# Navigate to frontend
 cd frontend
-
-# (First time only) Install dependencies
-npm install
-
-# Start development server
-npm start
+npm install    # First time only
+npm start      # Start server
 ```
 
-Frontend starts at: **http://localhost:3000**
+Frontend: **http://localhost:3000**
 
 ---
 
-## Step 3: Login
+## 🎯 Getting Started (New User)
 
-Use demo credentials:
+### 1. Create Account
+Go to `/signup` and register
 
-| Role | Email | Password |
-|------|-------|----------|
-| **Shopkeeper** | demo@shopkeeper.com | demo123 |
-| **Admin** | admin@shopkeeper.com | admin123 |
-
----
-
-## 🎯 User Workflow
-
-### For Shopkeepers
-
-1. **Login** → Go to http://localhost:3000/login
-2. **First Time?** → Complete the onboarding tour
-3. **Record Sales** → Type "Sold 5 rice at 80" in chat
-4. **Record Purchases** → Type "Bought 10 pens at 20"
-5. **Create Invoices** → Type "Invoice for Ahmed: 3 rice at 80"
-6. **Check Inventory** → Click "Inventory" or type "Show inventory"
-7. **View Reports** → Click "Reports" for analytics
-8. **Get Alerts** → Type "What should I reorder?"
-
-### For Admins
-
-1. **Login** with admin credentials
-2. **View Dashboard** → System overview
-3. **Manage Users** → Activate/deactivate accounts
-4. **View Statistics** → Total users, products, sales
-5. **Check System Health** → API, Database status
-
----
-
-## 📱 Pages Overview
-
-| Page | How to Access | Purpose |
-|------|---------------|---------|
-| **Home** | http://localhost:3000 | Landing page |
-| **Login** | /login | Sign in |
-| **Signup** | /signup | Create account |
-| **Dashboard** | /dashboard | AI Chat interface |
-| **Inventory** | /inventory | Manage products |
-| **Invoices** | /invoices | View/print invoices |
-| **Reports** | /reports | Sales analytics |
-| **Settings** | /settings | Profile & preferences |
-| **Admin** | /admin | User management |
-| **Help** | /help | User guide |
-
----
-
-## 💬 Quick Commands
+### 2. Add Your First Products
+Type these commands in the chat:
 
 ```
-Sold 5kg rice at 80
-Bought 10 pens at 20 each
-Invoice for Ahmed: 3 rice at 80, 2 oil at 150
-Show inventory
+Bought 50 rice at 70
+Bought 30 cooking oil at 280
+Bought 40 sugar at 90
+```
+
+### 3. Start Selling
+```
+Sold 5 rice at 85
+Sold 2 cooking oil at 320
+```
+
+### 4. Create Invoices
+```
+Invoice for Ali: 3 rice at 85, 2 oil at 320
+```
+
+### 5. Check Reports
+```
 Today's summary
 What should I reorder?
 ```
 
 ---
 
-## ⚠️ Troubleshooting
+## 💬 Quick Commands Reference
 
-### Backend won't start?
-```powershell
-# Make sure venv is activated
-.\venv\Scripts\activate
-
-# Reinstall dependencies
-pip install -r requirements.txt
-```
-
-### Frontend won't start?
-```powershell
-# Delete and reinstall
-Remove-Item -Recurse -Force node_modules
-npm install
-npm start
-```
-
-### Login not working?
-1. Make sure backend is running on port 8000
-2. Run `python seed_demo_data.py` to create demo users
-3. Clear browser localStorage and try again
-
-### Chat not responding?
-1. Check if GROQ_API_KEY is in backend/.env
-2. The app works without it (uses regex fallback)
-3. Check backend terminal for errors
+| Action | Command |
+|--------|---------|
+| **Add Stock** | `Bought 50 rice at 70` |
+| **Record Sale** | `Sold 5 rice at 85` |
+| **Create Invoice** | `Invoice for Ali: 3 rice at 85` |
+| **View Inventory** | `Show inventory` |
+| **Daily Report** | `Today's summary` |
+| **Low Stock** | `What should I reorder?` |
+| **Price Advice** | `What price for rice?` |
+| **Help** | `Help` |
 
 ---
 
-## 🔑 Getting Groq API Key (Free)
+## 📱 Pages
 
-1. Visit [console.groq.com](https://console.groq.com)
+| Page | URL | Purpose |
+|------|-----|---------|
+| Dashboard | /dashboard | AI Chat interface |
+| Inventory | /inventory | Manage products |
+| Invoices | /invoices | View invoices |
+| Reports | /reports | Sales analytics |
+| Settings | /settings | Profile settings |
+| Admin | /admin | User management |
+
+---
+
+## ⚠️ Troubleshooting
+
+| Problem | Solution |
+|---------|----------|
+| Backend won't start | Activate venv: `.\venv\Scripts\activate` |
+| Frontend won't start | Delete node_modules and run `npm install` |
+| Login not working | Run `python seed_demo_data.py` |
+| Chat not responding | App works without Groq API (uses fallback) |
+| Empty inventory | Add products: `Bought 50 rice at 70` |
+
+---
+
+## 🔑 Groq API Key (Optional)
+
+1. Go to [console.groq.com](https://console.groq.com)
 2. Create free account
-3. Go to "API Keys" section
-4. Click "Create API Key"
-5. Add to `backend/.env`:
+3. Generate API key
+4. Add to `backend/.env`:
    ```
    GROQ_API_KEY=your_key_here
    ```
 
 ---
 
-## 🌐 Deployment
+## 📖 More Documentation
 
-### Live Demo
-
-| Service | Platform | URL |
-|---------|----------|-----|
-| Frontend | Vercel | [ai-assistant-for-small-shopkeepers.vercel.app](https://ai-assistant-for-small-shopkeepers.vercel.app) |
-| Backend | Deployra | [shopkeeperai-backend-tnfddrjd.deployra.app](https://shopkeeperai-backend-tnfddrjd.deployra.app) |
-
-### Deploy Backend (Deployra)
-
-1. Go to [deployra.com](https://deployra.com) → New Service → Web Service
-2. Connect GitHub repository
-3. Configure:
-   - **Path to Dockerfile**: `./Dockerfile`
-   - **External Port**: `80`
-   - **Internal Port**: `8000`
-4. Add Environment Variables:
-   ```
-   GROQ_API_KEY=your_groq_api_key
-   SECRET_KEY=your_random_secret
-   FRONTEND_URL=https://your-frontend.vercel.app
-   ```
-5. Deploy!
-
-### Deploy Frontend (Vercel)
-
-1. Go to [vercel.com](https://vercel.com) → Add New Project
-2. Import GitHub repository
-3. Set **Root Directory**: `frontend`
-4. Add Environment Variable:
-   ```
-   REACT_APP_API_URL=https://your-backend.deployra.app
-   ```
-5. Deploy!
-
----
-
-## 📞 Need Help?
-
-- Check the **Help** page at /help
-- Read the README.md for full documentation
-- Visit the **Contact** page for support
+- [docs/User_Guide.md](docs/User_Guide.md) - Complete user guide
+- [docs/Project_Report.md](docs/Project_Report.md) - Technical documentation
+- [README.md](README.md) - Full project readme

@@ -68,39 +68,46 @@ def parse_with_regex(message: str) -> dict:
     if re.match(r'^(help|what can you do|commands)', message_lower):
         return {"intent": "help", "entities": {}}
     
-    # Sale patterns
+    # Sale patterns - improved to capture multi-word product names
     sale_patterns = [
-        r'sold?\s+(\d+\.?\d*)\s*(?:kg|pieces?|pcs?|units?)?\s*(?:of\s+)?(\w+)\s*(?:at|@|for)\s*(?:rs\.?|₹)?\s*(\d+\.?\d*)',
-        r'sold?\s+(\d+\.?\d*)\s+(\w+)\s*(?:at|@|for)\s*(?:rs\.?|₹)?\s*(\d+\.?\d*)',
-        r'(\d+\.?\d*)\s*(\w+)\s+sold\s*(?:at|@|for)\s*(?:rs\.?|₹)?\s*(\d+\.?\d*)',
+        # "sold 5 kg cooking oil at 80" or "sold 5 rice at 80"
+        r'sold?\s+(\d+\.?\d*)\s*(?:kg|pieces?|pcs?|units?)?\s*(?:of\s+)?(.+?)\s+(?:at|@|for)\s*(?:rs\.?|₹)?\s*(\d+\.?\d*)',
+        # "5 rice sold at 80"
+        r'(\d+\.?\d*)\s+(.+?)\s+sold\s*(?:at|@|for)\s*(?:rs\.?|₹)?\s*(\d+\.?\d*)',
     ]
     
     for pattern in sale_patterns:
         match = re.search(pattern, message_lower)
         if match:
+            product = match.group(2).strip()
+            # Clean up product name - remove trailing words like "each", "per"
+            product = re.sub(r'\s+(each|per|piece|kg|unit)s?$', '', product)
             return {
                 "intent": "record_sale",
                 "entities": {
                     "quantity": float(match.group(1)),
-                    "product": match.group(2),
+                    "product": product,
                     "price": float(match.group(3))
                 }
             }
     
-    # Purchase patterns
+    # Purchase patterns - improved to capture multi-word product names
     purchase_patterns = [
-        r'(?:bought|purchased?|restocked?|got)\s+(\d+\.?\d*)\s*(?:kg|pieces?|pcs?|units?)?\s*(?:of\s+)?(\w+)\s*(?:at|@|for)\s*(?:rs\.?|₹)?\s*(\d+\.?\d*)',
-        r'(?:bought|purchased?)\s+(\d+\.?\d*)\s+(\w+)\s*(?:at|@|for)\s*(?:rs\.?|₹)?\s*(\d+\.?\d*)',
+        # "bought 10 cooking oil at 280" or "bought 10 kg rice at 70"
+        r'(?:bought|purchased?|restocked?|got)\s+(\d+\.?\d*)\s*(?:kg|pieces?|pcs?|units?)?\s*(?:of\s+)?(.+?)\s+(?:at|@|for)\s*(?:rs\.?|₹)?\s*(\d+\.?\d*)',
     ]
     
     for pattern in purchase_patterns:
         match = re.search(pattern, message_lower)
         if match:
+            product = match.group(2).strip()
+            # Clean up product name - remove trailing words like "each", "per"
+            product = re.sub(r'\s+(each|per|piece|kg|unit)s?$', '', product)
             return {
                 "intent": "record_purchase",
                 "entities": {
                     "quantity": float(match.group(1)),
-                    "product": match.group(2),
+                    "product": product,
                     "price": float(match.group(3))
                 }
             }

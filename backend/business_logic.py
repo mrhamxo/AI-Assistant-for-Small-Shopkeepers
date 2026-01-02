@@ -115,6 +115,10 @@ def record_purchase(user_id: int, product_name: str, quantity: float, cost_price
         conn = get_db_connection()
         cursor = conn.cursor()
         
+        # Get current stock before update
+        cursor.execute("SELECT stock FROM products WHERE id = ?", (product_id,))
+        current_stock = cursor.fetchone()[0] or 0
+        
         # Record the purchase
         cursor.execute("""
             INSERT INTO purchases (user_id, product_id, product_name, quantity, cost_price, date)
@@ -126,13 +130,16 @@ def record_purchase(user_id: int, product_name: str, quantity: float, cost_price
         
         conn.commit()
         
+        new_stock = current_stock + quantity
         total = quantity * cost_price
         logger.info(f"Purchase recorded: {quantity} x {product_name} @ {cost_price}")
         return {
             "product": product_name,
             "quantity": quantity,
             "cost_price": cost_price,
-            "total": total
+            "total": total,
+            "new_stock": new_stock,
+            "is_new_product": current_stock == 0
         }
     except Exception as e:
         logger.error(f"Record purchase error: {e}")
@@ -349,6 +356,13 @@ def suggest_reorder(user_id: int):
         conn = get_db_connection()
         cursor = conn.cursor()
         
+        # First check if user has any products
+        cursor.execute("SELECT COUNT(*) FROM products WHERE user_id = ?", (user_id,))
+        total_products = cursor.fetchone()[0]
+        
+        if total_products == 0:
+            return {"no_products": True, "items": []}
+        
         cursor.execute("""
             SELECT name, stock, cost_price FROM products 
             WHERE user_id = ? AND stock < 10 ORDER BY stock ASC
@@ -356,7 +370,7 @@ def suggest_reorder(user_id: int):
         
         items = [{"name": row[0], "stock": max(0, row[1] or 0), "cost_price": row[2]} for row in cursor.fetchall()]
         
-        return items
+        return {"no_products": False, "items": items}
     except Exception as e:
         logger.error(f"Suggest reorder error: {e}")
         raise
@@ -472,8 +486,15 @@ def process_chat_message(message: str, user_id: int):
                 return {"response": "Please specify the cost price. Example: 'Bought 10 notebooks at 25 each'"}
             
             result = record_purchase(user_id, product, quantity, price)
+            
+            # Build response message
+            response_msg = f"✅ Purchase recorded!\n\n📦 Product: {product}\n📊 Quantity: {quantity}\n💰 Cost: Rs.{price}/-\n💵 Total: Rs.{result['total']:.2f}/-\n📈 New Stock: {int(result['new_stock'])} units"
+            
+            if result.get('is_new_product'):
+                response_msg += "\n\n🆕 New product added to inventory!"
+            
             return {
-                "response": f"✅ Purchase recorded!\n\n📦 Product: {product}\n📊 Quantity: {quantity}\n💰 Cost: Rs.{price}/-\n💵 Total: Rs.{result['total']:.2f}/-",
+                "response": response_msg,
                 "data": result
             }
         
@@ -520,19 +541,57 @@ def process_chat_message(message: str, user_id: int):
         # Handle summary intent
         elif intent_type == "show_summary":
             summary = get_daily_summary(user_id)
+            
+            # Check if there are any sales today
+            if summary['total_sales'] == 0 and summary['total_items_sold'] == 0:
+                # Check if user has any products
+                inventory = get_inventory(user_id)
+                if not inventory:
+                    return {
+                        "response": f"📊 Daily Summary ({summary['date']})\n\n" +
+                        "📦 No products in inventory yet.\n\n" +
+                        "Start by adding products:\n" +
+                        "• \"Bought 50 rice at 70\"\n" +
+                        "• \"Bought 20 cooking oil at 280\"",
+                        "data": summary
+                    }
+                return {
+                    "response": f"📊 Daily Summary ({summary['date']})\n\n" +
+                    "📭 No sales recorded today yet.\n\n" +
+                    "Record a sale by saying:\n" +
+                    "• \"Sold 5 rice at 85\"",
+                    "data": summary
+                }
+            
             response = f"📊 Daily Summary ({summary['date']})\n\n"
             response += f"💰 Total Sales: Rs.{summary['total_sales']:.2f}/-\n"
             response += f"📈 Total Profit: Rs.{summary['total_profit']:.2f}/-\n"
-            response += f"🛒 Items Sold: {summary['total_items_sold']}"
+            response += f"🛒 Items Sold: {int(summary['total_items_sold'])}"
             
             if summary['top_selling_item']:
                 response += f"\n🏆 Top Seller: {summary['top_selling_item']}"
+            
+            if summary['low_stock_items']:
+                response += f"\n\n⚠️ Low Stock: {len(summary['low_stock_items'])} items need reordering"
             
             return {"response": response, "data": summary}
         
         # Handle reorder suggestion
         elif intent_type == "suggest_reorder":
-            items = suggest_reorder(user_id)
+            result = suggest_reorder(user_id)
+            
+            # Check if user has no products at all
+            if result.get("no_products"):
+                return {
+                    "response": "📦 Your inventory is empty!\n\n" +
+                    "To add products, record a purchase first:\n" +
+                    "• \"Bought 50 rice at 70\"\n" +
+                    "• \"Bought 20 oil at 280\"\n" +
+                    "• \"Bought 100 sugar at 90\"\n\n" +
+                    "This will add products to your inventory with stock."
+                }
+            
+            items = result.get("items", [])
             if not items:
                 return {"response": "✅ All items are well-stocked! No reordering needed."}
             
@@ -559,6 +618,18 @@ def process_chat_message(message: str, user_id: int):
         
         # Handle greeting
         elif intent_type == "greeting":
+            # Check if user has products
+            inventory = get_inventory(user_id)
+            if not inventory:
+                return {
+                    "response": "👋 Welcome! I see you're new here.\n\n" +
+                    "📦 **Getting Started:**\n\n" +
+                    "First, add your products by recording purchases:\n" +
+                    "• \"Bought 50 rice at 70\"\n" +
+                    "• \"Bought 20 cooking oil at 280\"\n" +
+                    "• \"Bought 100 sugar at 90\"\n\n" +
+                    "This will add products with stock to your inventory!"
+                }
             return {
                 "response": "👋 Hello! How can I help you today?\n\nI can help you with:\n• Recording sales and purchases\n• Creating invoices\n• Checking inventory\n• Daily summaries\n• Reorder suggestions"
             }
